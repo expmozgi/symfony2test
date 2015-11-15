@@ -1,0 +1,33 @@
+server {
+    server_name symfony2test.dev www.symfony2test.dev;
+    root /var/www/symfony2test.dev/web;
+
+    location / {
+        # try to serve file directly, fallback to app.php
+        try_files $uri /app.php$is_args$args;
+    }
+
+    # DEV
+    # This rule should only be placed on your development environment
+    # In production, don't include this and don't deploy app_dev.php or config.php
+    location ~ ^/(app_dev|config)\.php(/|$) {
+        fastcgi_split_path_info ^(.+\.php)(/.*)$;
+
+        include fastcgi_params;
+
+        fastcgi_param  SCRIPT_FILENAME  $realpath_root$fastcgi_script_name;
+        fastcgi_pass   127.0.0.1:9000;
+    }
+    # PROD
+    location ~ ^/app\.php(/|$) {
+        fastcgi_split_path_info ^(.+\.php)(/.*)$;
+
+        include fastcgi_params;
+
+        fastcgi_param  SCRIPT_FILENAME  $realpath_root$fastcgi_script_name;
+        fastcgi_pass   127.0.0.1:9000;
+    }
+
+    #error_log /var/log/nginx/project_error.log;
+    #access_log /var/log/nginx/project_access.log;
+}
